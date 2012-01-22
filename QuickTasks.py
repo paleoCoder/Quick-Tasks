@@ -1,30 +1,31 @@
 #! /usr/bin/env/python
 import Task
 
-def print_Tasks(tasks):
-    for index, t in enumerate(tasks):
-        print "%f - %s" % (index, t.getTaskDetails())
+def print_task(task):
+    print "%s: %s" % (task.name, task.text)
+    for index, t in enumerate(task.get_child_tasks()):
+        print "  %f - %s: %s" % (index, t.name, t.text)
 
-def processCommand(command, tasks):
+def process_command(command, task):
     if command == "n":
         name = raw_input("task name: ")
-        desc = raw_input("task desc: ")
-        return createTask(tasks, name, desc)
+        text = raw_input("task text: ")
+        return add_task(task, name, text)
     elif is_number(command):
-        return deleteTask(tasks, command)
+        return delete_task(task, command)
 
-def deleteTask(tasks, taskNumber):
-    del tasks[float(taskNumber)]
-    return tasks
+def delete_task(task, taskNumber):
+    task.remove_child_task(int(taskNumber))
+    return task
 
-def createTask(tasks, name, desc):
-    newTask = Task.Task(name, desc)
-    tasks.append(newTask)
-    return tasks
+def add_task(task, name, text):
+    newTask = Task.Task(name, text)
+    task.add_child_task(newTask)
+    return task
 
 def is_number(s):
     try:
-        float(s)
+        int(s)
         return True
     except ValueError:
         return False
@@ -35,18 +36,18 @@ if __name__ == "__main__":
     command = ""
 
     # array of task objects
-    tasks = []
+    parentTask = Task.Task("Parent Task", "things to do")
 
     print "Welcome to the Tasks driver"
 
     while command != "q":
         print
         print "current tasks"
-        print_Tasks(tasks)
+        print_task(parentTask)
         print "--"
         print "what next?"
         command = raw_input("Quit (q) New task (n), or complete (#): ")
         print "you entered: ", command
-        tasks = processCommand(command, tasks)
+        task = process_command(command, parentTask)
 
 
